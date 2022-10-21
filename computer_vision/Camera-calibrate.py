@@ -1,5 +1,6 @@
 import cv2 as cv
 import numpy as np
+import matplotlib.pyplot as plt
 
 def camera_calibration(img):
     criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
