@@ -1,3 +1,6 @@
+import cv2 as cv
+import numpy as np
+
 def camera_calibration(img):
     criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
@@ -32,11 +35,9 @@ def camera_calibration(img):
     print(mtx, dist)
     path = "calibration_chessboard.yml"
     save_coefficients(mtx, dist, path)
-    #img_1 = cv.cvtColor(img_1,cv.COLOR_BGR2GRAY)
     h,  w = img.shape[:2]
     print(h, w)
     newcameramtx, roi=cv.getOptimalNewCameraMatrix(mtx,dist,(w,h),1,(w,h))
     dst = cv.undistort(img, mtx, dist, None, newcameramtx)
-    #print(dst)
     
     print("dst done")
