@@ -2,7 +2,9 @@ import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
 
-def camera_calibration(img):
+from photo _capture import PullFrameFromStream
+
+def camera_calibrate(img):
     criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
     # prepare object points, like (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)
@@ -12,7 +14,10 @@ def camera_calibration(img):
     # Arrays to store object points and image points from all the images.
     objpoints = [] # 3d point in real world space
     imgpoints = [] # 2d points in image plane.
-
+    
+    if type(img) != np.array:
+        img = np.array(img)
+        
     img = np.array(img)
     #gray = cv.cvtColor(img,cv.COLOR_BGR2GRAY)
 
@@ -42,3 +47,29 @@ def camera_calibration(img):
     dst = cv.undistort(img, mtx, dist, None, newcameramtx)
     
     print("dst done")
+    
+def save_coefficients(mtx, dist, path):
+    '''Save the camera matrix and the distortion coefficients to given path/file.'''
+    cv_file = cv.FileStorage(path, cv.FILE_STORAGE_WRITE)
+    cv_file.write('K', mtx)
+    cv_file.write('D', dist)
+    # note you *release* you don't close() a FileStorage object
+    cv_file.release()
+
+def load_coefficients(path):
+    '''Loads camera matrix and distortion coefficients.'''
+    # FILE_STORAGE_READ
+    cv_file = cv.FileStorage(path, cv.FILE_STORAGE_READ)
+
+    # note we also have to specify the type to retrieve other wise we only get a
+    # FileNode object back instead of a matrix
+    camera_matrix = cv_file.getNode('K').mat()
+    dist_matrix = cv_file.getNode('D').mat()
+
+    cv_file.release()
+    return [camera_matrix, dist_matrix]
+    
+img = PullFrameFromStream()
+
+camera_calibrate(img)
+
