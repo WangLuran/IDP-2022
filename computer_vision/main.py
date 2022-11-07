@@ -17,7 +17,26 @@ x,y,w,h = roi
 img = dst[y:y+h, x:x+w]
 img = img[0:750, 0:450]
 points, x_plot, y_plot = filter_image_np(img, block_RGB)
-plt.scatter(points[:,0], points[:,1])
+'''plt.scatter(points[:,0], points[:,1])
 centroids = kmeans_open(points,3)
 plt.scatter(centroids[:,0], centroids[:,1])
-plt.show()
+plt.show()'''
+telnet = telnetlib.Telnet('172.20.10.7')
+search = ' '
+while search == ' ':
+    search = telnet.read_until('a')
+k = 3
+if search == 1:
+    img = PullFrameFromStream()
+    mtx, dist = load_coefficients('calibration_chessboard.yml')
+    img = np.array(img)
+    h,  w = img.shape[:2]
+    newcameramtx, roi=cv.getOptimalNewCameraMatrix(mtx,dist,(w,h),1,(w,h))
+    dst = cv.undistort(img, mtx, dist, None, newcameramtx)
+    x,y,w,h = roi
+    img = dst[y:y+h, x:x+w]
+    img = img[0:750, 0:400]
+    points, x_plot, y_plot = filter_image_np(img, block_RGB)
+    centroids = kmeans_open(points,k)
+    angle = calculate_angle(centroids)
+    telnet.write(str(angle))
